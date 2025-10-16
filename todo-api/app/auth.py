@@ -4,8 +4,6 @@ from passlib.context import CryptContext
 from dotenv import load_dotenv
 import os
 
-#secret Key is stored in a local .env folder
-load_dotenv()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
@@ -14,6 +12,8 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password:str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
+#secret Key is stored in a local .env folder
+load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHIM = "HS256"
 ACCESS_TOKEN_EXPIRATION_MINUTES = 30
