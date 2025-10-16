@@ -2,3 +2,6 @@ fastapi
 sqlalchemy
 psycopg2
 dotenv
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
