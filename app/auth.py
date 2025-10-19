@@ -1,4 +1,4 @@
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta, timezone
 from jose import JWTError, jwt, ExpiredSignatureError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -36,9 +36,9 @@ ACCESS_TOKEN_EXPIRATION_MINUTES = 30
 def create_access_token(data: dict, expires_delta: timedelta = None):
     data_to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
     data_to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(data_to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -50,28 +50,31 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 # ^Problem I had while making this
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
+        print(token)
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        print(payload)
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid Token"
             )
-    except ExpiredSignatureError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token has expired"
-            )
-    except JWTError:
+    except ExpiredSignatureError as e:
+        print(f"Error: {e}")
         raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Error Decoding Token"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired"
+        )
+    except JWTError as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Error Decoding Token"
         )
     user = db.query(models.User).filter(models.User.username == username).first()
     if user is None:
         raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid Username"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Username"
         )
-
     return user
