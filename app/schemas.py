@@ -47,3 +47,9 @@ class TodoUpdateOut(BaseModel):
     title: str
     due_by: datetime
     completed: bool
+
+class TodoDelete(BaseModel):
+    id:int
+
+class TodoDeleteOut(BaseModel):
+    success: bool

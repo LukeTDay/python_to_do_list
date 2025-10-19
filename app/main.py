@@ -99,3 +99,28 @@ def update_todo(
     db.commit()
     db.refresh(requested_todo_update)
     return requested_todo_update
+
+#What is the purpose of the response model if I have to send my own JSON?
+# These automatically sanitize your response so that only data you have
+# designated in your schemas will be sent.
+# In this i send a "password" but on the client side all i see is 
+# success : True
+#Deletes an existing todo list item by its index
+@app.post("/todos/delete",
+          response_model=schemas.TodoDeleteOut)
+def delete_todo(
+    requested_deletions: schemas.TodoDelete,
+    current_user: models.User = Depends(get_current_user),  
+    db: Session = Depends(get_db)
+    ):
+    requested_todo_deletion = db.query(models.Todo).filter((models.Todo.user_id == current_user.id) & (models.Todo.id == requested_deletions.id)).first()
+
+    if not requested_todo_deletion:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Todo not found during requested deletion"
+        )
+    db.delete(requested_todo_deletion)
+    db.commit()
+    return {"success" : True,
+            "realpw" : "password"}
