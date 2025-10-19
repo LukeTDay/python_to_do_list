@@ -13,7 +13,7 @@ class UserOut(BaseModel):
     username: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 #This is sent by the client to obtain a login token
 class UserLogin(BaseModel):
     username: str
@@ -34,7 +34,7 @@ class TodoOut(BaseModel):
     completed: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TodoUpdate(BaseModel):
     id: int
