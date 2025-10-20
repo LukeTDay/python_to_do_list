@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Todo App</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+    <h1>Login</h1>
+
+    <div id="message"></div>
+
+    <form id="loginform">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br><br>
+
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <a href="/">Back to Home</a>
+    <a href="/register-page">Don't have an account?</a>
+
+    <script>
+        const loginform = document.getElementById("loginform");
+        const messageDiv = document.getElementById("message");
+
+        loginform.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(loginform);
+            const data = new URLSearchParams();
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]);
+            }
+
+            try {
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: data
+                });
+
+                if (response.ok) {
+                    const json = await response.json();
+                    localStorage.setItem("token", json.access_token);
+                    messageDiv.textContent = "Login successful! Redirecting...";
+                    messageDiv.style.color = "green";
+
+                    setTimeout(() => {
+                        window.location.href = "/dashboard";
+                    }, 1000);
+                } else {
+                    messageDiv.textContent = "Invalid credentials, try again.";
+                    messageDiv.style.color = "red";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                messageDiv.textContent = "Something went wrong, try again.";
+                messageDiv.style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -24,6 +24,9 @@ templates =  Jinja2Templates(directory="app/templates")
 async def homepage(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/login-page", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request":  request})
 
 @app.post("/login", response_model=schemas.Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(),
