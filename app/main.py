@@ -1,6 +1,9 @@
-from fastapi import Depends, HTTPException, status, FastAPI
-from sqlalchemy.orm import Session
+from fastapi import Depends, HTTPException, status, FastAPI, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
 from typing import List
 
 from . import models, schemas, auth
@@ -12,6 +15,15 @@ from .auth import get_current_user
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory= "app/static"), name = "static")
+
+templates =  Jinja2Templates(directory="app/templates")
+
+@app.get("/", response_class=HTMLResponse)
+async def homepage(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
 
 @app.post("/login", response_model=schemas.Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(),
