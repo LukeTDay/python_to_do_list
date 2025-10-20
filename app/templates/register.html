@@ -7,63 +7,78 @@
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 </head>
 <body>
-    <h1>Login</h1>
+    <h1>Register</h1>
 
     <div id="message"></div>
 
-    <form id="loginform">
+    <form id="registerform">
         <label for="username">Username:</label><br>
         <input type="text" id="username" name="username" required><br><br>
 
         <label for="password">Password:</label><br>
         <input type="password" id="password" name="password" required><br><br>
 
-        <button type="submit">Login</button>
+        <label for="passwordconfirm">Confirm Password:</label><br>
+        <input type="password" id="passwordconfirm" name="passwordconfirm" required><br><br>
+
+        <button type="submit">Register</button>
     </form>
 
     <a href="/">Back to Home</a>
-    <a href="/register-page">Don't have an account?</a>
+    <a href="/login-here">Already have an account?</a>
 
     <script>
-        const loginform = document.getElementById("loginform");
+        const registerform = document.getElementById("registerform");
         const messageDiv = document.getElementById("message");
 
-        loginform.addEventListener("submit", async function(event) {
+        registerform.addEventListener("submit", async function(event) {
             event.preventDefault();
 
-            const formData = new FormData(loginform);
-            const data = new URLSearchParams();
+            const formData = new FormData(registerform);
+
+            if (formData.get("password") !== formData.get("passwordconfirm")){
+                messageDiv.textContent = "Passwords do not match!";
+                messageDiv.style.color = "red";
+                return;
+            }
+
+            const data =  new URLSearchParams();
             for (const pair of formData) {
                 data.append(pair[0], pair[1]);
             }
 
             try {
-                const response = await fetch("/login", {
+                const jsonData = {
+                    username: formData.get("username"),
+                    password: formData.get("password")
+                };
+
+                const response = await fetch("/register", {
                     method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: data
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(jsonData)
                 });
 
                 if (response.ok) {
                     const json = await response.json();
                     localStorage.setItem("token", json.access_token);
                     localStorage.setItem("username", json.username);
-                    messageDiv.textContent = "Login successful! Redirecting...";
+                    messageDiv.textContent = "Registered new account! Redirecting...";
                     messageDiv.style.color = "green";
 
                     setTimeout(() => {
                         window.location.href = "/dashboard";
                     }, 1000);
                 } else {
-                    messageDiv.textContent = "Invalid credentials, try again.";
+                    messageDiv.textContent = "Username already in use, try again";
                     messageDiv.style.color = "red";
                 }
+
             } catch (error) {
                 console.error("Error:", error);
                 messageDiv.textContent = "Something went wrong, try again.";
-                messageDiv.style.color = "red";
+                messageDiv.style.color = "red"; 
             }
         });
     </script>
 </body>
-</html>

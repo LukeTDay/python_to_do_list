@@ -28,7 +28,11 @@ async def homepage(request: Request):
 async def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request":  request})
 
-@app.post("/login", response_model=schemas.Token)
+@app.get("/register-page", response_class=HTMLResponse)
+async def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request":  request})
+
+@app.post("/login", response_model=schemas.TokenOut)
 def login(form_data: OAuth2PasswordRequestForm = Depends(),
           db: Session = Depends(get_db)):
     
@@ -40,7 +44,10 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(),
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
     
     access_token = auth.create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "username": user.username,
+        "access_token": access_token,
+        "token_type": "bearer"}
 
 @app.post("/register", response_model=schemas.UserOut)
 def register(user: UserCreate,
@@ -61,7 +68,14 @@ def register(user: UserCreate,
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+
+    access_token = auth.create_access_token(data={"sub": new_user.username})
+
+    return {
+        "username": new_user.username,
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
 
 @app.get("/todos", response_model=List[schemas.TodoOut])
 def read_todos(current_user: models.User = Depends(get_current_user),

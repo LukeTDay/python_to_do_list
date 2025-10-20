@@ -9,8 +9,9 @@ class UserCreate(BaseModel):
 
 #This is sent by the server when an account is succsesfully created
 class UserOut(BaseModel):
-    id: int
     username: str
+    access_token: str
+    token_type: str = "bearer"
 
     class Config:
         from_attributes = True
@@ -19,9 +20,10 @@ class UserLogin(BaseModel):
     username: str
     password: str
 #This will be sent by the server after a successful login
-class Token(BaseModel):
+class TokenOut(BaseModel):
+    username: str
     access_token: str
-    token_type: str
+    token_type: str = "Bearer"
 
 class TodoCreate(BaseModel):
     title: str
