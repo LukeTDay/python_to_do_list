@@ -153,3 +153,7 @@ def delete_todo(
     db.commit()
     return {"success" : True,
             "realpw" : "password"}
+
+@app.get("/auth/checktoken")
+def check_token(current_user: models.User = Depends(get_current_user)):
+    return {"username" : current_user.username}
