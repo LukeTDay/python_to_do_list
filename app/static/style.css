@@ -53,3 +53,20 @@ div {
     font-size: 30px;
     background: none;
 }
+
+form {
+    flex-direction: column;
+    display: flex;
+}
+
+form input {
+    width: 200px;
+    align-items: center;
+}
+
+form button{
+    width: 100px;
+    margin: 0 auto;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}

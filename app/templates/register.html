@@ -21,64 +21,95 @@
         <label for="passwordconfirm">Confirm Password:</label><br>
         <input type="password" id="passwordconfirm" name="passwordconfirm" required><br><br>
 
-        <button type="submit">Register</button>
+        <button type="register_button" id="register_button">Register</button>
     </form>
 
-    <a href="/">Back to Home</a>
-    <a href="/login-here">Already have an account?</a>
+        <button id="home_button">Back to Home</button>
+        <button id="login_button">Already have an account?</button>
+        <div id="notification_div"></div>
 
     <script>
-        const registerform = document.getElementById("registerform");
-        const messageDiv = document.getElementById("message");
+        //Notification Div
+        const notification_div = document.getElementById("notification_div");
 
-        registerform.addEventListener("submit", async function(event) {
+        //Register Button
+        const register_button = document.getElementById("register_button");
+        const username_form = document.getElementById("username");
+        const password_form = document.getElementById("password");
+        const passwordconfirm_form = document.getElementById("passwordconfirm");
+        //Expecting a UserCreate schema with the username and then the password    
+        register_button.addEventListener("click", async(event) =>{
             event.preventDefault();
+            //Must declare this in loop, if they are outside they will be None
+            username = username_form.value;
+            password = password_form.value;
+            passwordconfirm = passwordconfirm_form.value;
 
-            const formData = new FormData(registerform);
 
-            if (formData.get("password") !== formData.get("passwordconfirm")){
-                messageDiv.textContent = "Passwords do not match!";
-                messageDiv.style.color = "red";
+            if (passwordconfirm !== password) {
+                notification_div.style.visibility = "visible"
+                notification_div.textContent = "Passwords must match eachother";
+                notification_div.style.background = "grey";
+                setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
                 return;
-            }
 
-            const data =  new URLSearchParams();
-            for (const pair of formData) {
-                data.append(pair[0], pair[1]);
             }
-
             try {
-                const jsonData = {
-                    username: formData.get("username"),
-                    password: formData.get("password")
-                };
-
-                const response = await fetch("/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(jsonData)
+                
+                const response = await fetch(`/register`, {
+                    method : "POST",
+                    headers : { "Content-Type": "application/json"},
+                    //Need to use JSON.Stringify because it manually sanitized password and usernames
+                    // for things like quotes that would break a JSON if it was constructed manually
+                    body: JSON.stringify({username,password})
                 });
 
-                if (response.ok) {
-                    const json = await response.json();
-                    localStorage.setItem("token", json.access_token);
-                    localStorage.setItem("username", json.username);
-                    messageDiv.textContent = "Registered new account! Redirecting...";
-                    messageDiv.style.color = "green";
-
-                    setTimeout(() => {
-                        window.location.href = "/dashboard";
-                    }, 1000);
-                } else {
-                    messageDiv.textContent = "Username already in use, try again";
-                    messageDiv.style.color = "red";
+                if (response.status === 401) {
+                    notification_div.style.visibility = "visible"
+                    notification_div.textContent = "Error with registration";
+                    notification_div.style.background = "grey";
+                }
+                else if (response.status === 422) {
+                    notification_div.style.visibility = "visible"
+                    notification_div.textContent = "Error with registration";
+                    notification_div.style.background = "grey";
                 }
 
-            } catch (error) {
-                console.error("Error:", error);
-                messageDiv.textContent = "Something went wrong, try again.";
-                messageDiv.style.color = "red"; 
+                if (response.status === 200) {
+                    const data = await response.json();
+                    sessionStorage.setItem("username", data.username);
+                    sessionStorage.setItem("token", data.access_token);
+                    notification_div.style.visibility = "visible"
+                    notification_div.textContent = "Welcome";
+                    notification_div.style.background = "grey";
+                    setTimeout(() => {window.location.href = "/login-page";}, 1000);
+                }
             }
-        });
+            catch (error){
+                notification_div.style.visibility = "visible"
+                notification_div.textContent = "Error";
+                notification_div.style.background = "grey";
+                setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
+            }
+        })  
+
+
+        //Login Button
+        const login_button = document.getElementById("login_button");
+        login_button.addEventListener("click", () => {
+            notification_div.style.visibility = "visible"
+            notification_div.textContent = "Redirecting to the login page"
+            notification_div.style.background = "grey"
+            setTimeout(() => {window.location.href = "/login-page";}, 1000);
+        })
+
+        //Home Button
+        const home_button = document.getElementById("home_button");
+        home_button.addEventListener("click", () => {
+            notification_div.style.visibility = "visible"
+            notification_div.textContent = "Redirecting to the home page"
+            notification_div.style.background = "grey"
+            setTimeout(() => {window.location.href = "/";}, 1000);
+        })
     </script>
 </body>
