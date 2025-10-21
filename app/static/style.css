@@ -45,5 +45,11 @@ button {
 
 button:hover {
     color: black;
-    background: #a2a6ad;
+    background: gray;
+}
+
+div {
+    color: white;
+    font-size: 30px;
+    background: none;
 }

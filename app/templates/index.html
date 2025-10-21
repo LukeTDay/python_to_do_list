@@ -14,7 +14,7 @@
 
         <button id = "login_button">Login</button>
         <button id = "register_button">Click here to make an account</button>
-        <div id="notification_div">Test</div>
+        <div id="notification_div"></div>
     </body>
 
     <script>
@@ -25,6 +25,7 @@
         const login_button = document.getElementById("login_button");
         login_button.addEventListener("click", () => {
             notification_div.textContent = "Redirecting to the login page"
+            notification_div.style.background = "grey"
             setTimeout(() => {window.location.href = "/login-page";}, 1000);
         })
 
@@ -32,6 +33,7 @@
         const register_button = document.getElementById("register_button");
         register_button.addEventListener("click", () => {
             notification_div.textContent = "Redirecting to the registration page"
+            notification_div.style.background = "grey"
             setTimeout(() => {window.location.href = "/register-page";}, 1000);
         })
     </script>
