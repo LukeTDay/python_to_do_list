@@ -7,34 +7,6 @@
         <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     </head>
     <body>
-        <script>
-            const token = localStorage.getItem("token");
-            const name = localStorage.getItem("username");
-            async function checkToken() {
-                if (token) {
-                    try{
-                        const response = await fetch("/auth/checktoken", {
-                        headers: { "Authorization" : `Bearer ${token}`}
-                    });
-
-                    if (response.ok) {
-                        const json = await response.json();
-                        window.location.href = "/dashboard";
-                    }
-                    else if (response.status === 401) {
-                        localStorage.removeItem("token");
-                        localStorage.removeItem("username");
-                        window.location.href = "/";
-                    }
-
-                    }catch (error){
-                        console.error("Error:", error);
-                    }
-                }
-            }
-
-            checkToken();
-        </script>
 
         <h1>Welcome to my Todo App</h1>
         <p>This app lets you manage your personal Todo list</p>

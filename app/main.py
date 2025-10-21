@@ -32,6 +32,10 @@ async def login_page(request: Request):
 async def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request":  request})
 
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request):
+    return templates.TemplateResponse("dashboard.html", {"request":  request})
+
 @app.post("/login", response_model=schemas.TokenOut)
 def login(form_data: OAuth2PasswordRequestForm = Depends(),
           db: Session = Depends(get_db)):
@@ -80,9 +84,11 @@ def register(user: UserCreate,
 @app.get("/todos", response_model=List[schemas.TodoOut])
 def read_todos(current_user: models.User = Depends(get_current_user),
                 db: Session = Depends(get_db),
+                skip: int = 0,
+                limit: int = 5
                 ):
     
-    todos = db.query(models.Todo).filter(models.Todo.user_id == current_user.id).all()
+    todos = db.query(models.Todo).filter(models.Todo.user_id == current_user.id).offset(skip).limit(limit).all()
     return todos
 
 @app.post("/todos", response_model=schemas.TodoOut)
@@ -104,20 +110,23 @@ def create_todo(
     return new_todo
 
 #Updates an existing todo list item
-@app.post("/todos/update", response_model=schemas.TodoUpdateOut)
+@app.put("/todos/{id}", response_model=schemas.TodoUpdateOut)
 def update_todo(
+    id: int,
     requested_update: schemas.TodoUpdate,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
-    ):
-    requested_todo_update = db.query(models.Todo).filter((models.Todo.user_id == current_user.id) & (models.Todo.id == requested_update.id)).first()
+):
+    requested_todo_update = (
+        db.query(models.Todo)
+        .filter(models.Todo.user_id == current_user.id)
+        .filter(models.Todo.id == id)
+        .first()
+    )
 
     if not requested_todo_update:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Todo not found"
-        )
-    
+        raise HTTPException(status_code=404, detail="Todo not found")
+
     if requested_update.title is not None:
         requested_todo_update.title = requested_update.title
     if requested_update.due_by is not None:
@@ -128,6 +137,7 @@ def update_todo(
     db.commit()
     db.refresh(requested_todo_update)
     return requested_todo_update
+
 
 #What is the purpose of the response model if I have to send my own JSON?
 # These automatically sanitize your response so that only data you have
