@@ -5,13 +5,34 @@
         <title>My Todo App</title>
         <link rel="stylesheet" href="/static/style.css">
         <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+        
     </head>
     <body>
-
         <h1>Welcome to my Todo App</h1>
         <p>This app lets you manage your personal Todo list</p>
 
-        <a href="/login-page">Login</a>
-        <a href="/register-page">Create an account</a>
+        <button id = "login_button">Login</button>
+        <button id = "register_button">Click here to make an account</button>
+        <div id="notification_div">Test</div>
     </body>
+
+    <script>
+        //Notification Div
+        const notification_div = document.getElementById("notification_div")
+
+        //Login Button
+        const login_button = document.getElementById("login_button");
+        login_button.addEventListener("click", () => {
+            notification_div.textContent = "Redirecting to the login page"
+            setTimeout(() => {window.location.href = "/login-page";}, 1000);
+        })
+
+        //Register Button
+        const register_button = document.getElementById("register_button");
+        register_button.addEventListener("click", () => {
+            notification_div.textContent = "Redirecting to the registration page"
+            setTimeout(() => {window.location.href = "/register-page";}, 1000);
+        })
+    </script>
 </html>
