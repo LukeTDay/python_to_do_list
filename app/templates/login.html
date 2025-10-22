@@ -57,7 +57,7 @@
                 setTimeout(() => {window.location.href = "/dashboard";notification_div.style.visibility = "hidden";}, 1000);
             }
             //Error with username or password
-            else if (response === 401){
+            else if (response.status === 401){
                 notification_div.style.visibility = "visible"
                 notification_div.textContent = `Error with Login(401)`;
                 notification_div.style.background = "grey";
