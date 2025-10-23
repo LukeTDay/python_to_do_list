@@ -52,11 +52,15 @@ div {
     color: white;
     font-size: 30px;
     background: none;
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 form {
     flex-direction: column;
     display: flex;
+    align-items: center;
 }
 
 form input {
@@ -69,4 +73,27 @@ form button{
     margin: 0 auto;
     margin-top: 20px;
     margin-bottom: 10px;
+}
+
+input {
+    display: flex;
+    flex-direction: column;
+    justify-content: top;
+    align-items: center;
+}
+
+table {
+    display: flex;
+    flex-direction: column;
+    justify-content: top;
+    align-items: center;
+}
+
+table, th, tr{
+    border: 1px solid darkolivegreen;
+    border-collapse: collapse;
+}
+
+td, th {
+    padding: 10px;
 }

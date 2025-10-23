@@ -11,8 +11,9 @@
         <h1>My Todo List</h1>
 
         <form id="todo-form" class="todo-form">
-            <input type="text" id="todo-input" placeholder="Task title..." required>
-            <input type="datetime-local" id="todo-due" required>
+            <input type="text" id="todo_text" placeholder="Task title..." required>
+            <input type="date" id="todo_date" required>
+            <input type="time" id="todo_time" required>
             <button type="submit">Add</button>
         </form>
 
@@ -36,161 +37,52 @@
         </div>
     </div>
 
+    <div id="notification_div"></div>
+
     <script>
-        let currentPage = 1;
-        const limit = 5;
+        //Notification Div
+        const notification_div = document.getElementById("notification_div");
 
-        function getToken() {
-            return localStorage.getItem("token");
-        }
 
-        function handleUnauthorized() {
-            localStorage.removeItem("token");
-            localStorage.removeItem("username");
-            alert("Your session has expired. Please log in again.");
-            window.location.href = "/login-page";
-        }
-
-        async function fetchTodos(page = 1) {
-            const token = getToken();
-            if (!token) {
-                window.location.href = "/login-page";
-                return;
-            }
-
-            const skip = (page - 1) * limit;
-
+        async function getTodos() {
             try {
-                const response = await fetch(`/todos?skip=${skip}&limit=${limit}`, {
-                    headers: { "Authorization": `Bearer ${token}` }
+                const params = new URLSearchParams({ skip: 0, limit: 5 });
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`/todos?${params}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                 }
                 });
 
-                if (response.status === 401) {
-                    handleUnauthorized();
-                    return;
+                if (response.status === 401){
+                    sessionStorage.removeItem("token");
+                    sessionStorage.removeItem("username");
+                    notification_div.style.visibility = "visible";
+                    notification_div.textContent = `Please login again`;
+                    notification_div.style.background = "grey";
+                    setTimeout(() => {window.location.href = "/login-page";notification_div.style.visibility = "hidden";}, 2000);
                 }
+                else if (response.status === 200){
+                    name = sessionStorage.getItem("username");
+                    notification_div.style.visibility = "visible";
+                    notification_div.textContent = `Welcome back ${name}`;
+                    notification_div.style.background = "grey";
+                    setTimeout(() => {notification_div.style.visibility = "hidden";}, 3000);
 
-                const todos = await response.json();
-                renderTodos(todos);
-
-            } catch (err) {
-                console.error(err);
-                alert("Failed to load todos.");
+                }
+            } catch (error) {
+                notification_div.style.visibility = "visible"
+                notification_div.textContent = "Unknown Error has occured";
+                notification_div.style.background = "grey";
+                setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
             }
         }
 
-        function renderTodos(todos) {
-            const tbody = document.getElementById("todo-body");
-            tbody.innerHTML = "";
+        getTodos()
 
-            todos.forEach(todo => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${todo.id}</td>
-                    <td><input type="text" value="${todo.title}" id="title-${todo.id}"></td>
-                    <td><input type="datetime-local" value="${new Date(todo.due_by).toISOString().slice(0,16)}" id="due-${todo.id}"></td>
-                    <td><input type="checkbox" ${todo.completed ? "checked" : ""} id="completed-${todo.id}"></td>
-                    <td>
-                        <button onclick="updateTodo(${todo.id})">Update</button>
-                        <button onclick="deleteTodo(${todo.id})">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
 
-            document.getElementById("page-info").textContent = `Page ${currentPage}`;
-        }
 
-        async function deleteTodo(id) {
-            const token = getToken();
-            const response = await fetch(`/todos/delete`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ id })
-            });
-
-            if (response.status === 401) {
-                handleUnauthorized();
-                return;
-            }
-
-            if (response.ok) fetchTodos(currentPage);
-            else alert("Could not delete todo.");
-        }
-
-        async function updateTodo(id) {
-            const token = getToken();
-            const title = document.getElementById(`title-${id}`).value.trim();
-            const due_by = document.getElementById(`due-${id}`).value;
-            const completed = document.getElementById(`completed-${id}`).checked;
-
-            const response = await fetch(`/todos/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ id, title, due_by, completed })
-            });
-
-            if (response.status === 401) {
-                handleUnauthorized();
-                return;
-            }
-
-            if (!response.ok) alert("Could not update todo.");
-            else fetchTodos(currentPage);
-        }
-
-        document.getElementById("todo-form").addEventListener("submit", async e => {
-            e.preventDefault();
-            const token = getToken();
-            if (!token) {
-                window.location.href = "/login-page";
-                return;
-            }
-
-            const title = document.getElementById("todo-input").value.trim();
-            const due_by = document.getElementById("todo-due").value;
-            if (!title || !due_by) return;
-
-            const response = await fetch("/todos", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ title, due_by })
-            });
-
-            if (response.status === 401) {
-                handleUnauthorized();
-                return;
-            }
-
-            if (response.ok) {
-                document.getElementById("todo-input").value = "";
-                document.getElementById("todo-due").value = "";
-                fetchTodos(currentPage);
-            } else alert("Could not add todo.");
-        });
-
-        document.getElementById("next").addEventListener("click", () => {
-            currentPage++;
-            fetchTodos(currentPage);
-        });
-
-        document.getElementById("prev").addEventListener("click", () => {
-            if (currentPage > 1) {
-                currentPage--;
-                fetchTodos(currentPage);
-            }
-        });
-
-        fetchTodos();
     </script>
 </body>
 </html>
