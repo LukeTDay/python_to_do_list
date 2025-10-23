@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 </head>
 <body>
-    <div class="container">
+    
         <h1>My Todo List</h1>
 
         <form id="todo-form" class="todo-form">
@@ -20,14 +20,13 @@
         <table id="todo-table">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Title</th>
                     <th>Due</th>
                     <th>Done</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="todo-body"></tbody>
+            <tbody id="todo_body"></tbody>
         </table>
 
         <div class="pagination">
@@ -35,7 +34,7 @@
             <span id="page-info">Page 1</span>
             <button id="next">Next &raquo;</button>
         </div>
-    </div>
+    
 
     <div id="notification_div"></div>
 
@@ -71,6 +70,38 @@
                     setTimeout(() => {notification_div.style.visibility = "hidden";}, 3000);
 
                 }
+
+                const todos = await response.json();
+                //Table body
+                const table_body = document.getElementById("todo_body");
+                table_body.innerHTML = ""
+                console.log(todos)
+                
+                todos.forEach(todo => {
+                    const row = document.createElement("tr");
+
+                    const description_cell = document.createElement("td");
+                    description_cell.textContent = todo.title;
+
+                    const due_date_cell = document.createElement("td");
+                    const due = todo.due_by;
+                    const [date, time] = due.split("T");
+                    due_date_cell.textContent = `${date} ${time.split(".")[0]}`;
+
+                    const completion_cell = document.createElement("td");
+                    completion_cell.textContent = todo.completed
+
+                    const action_cell = document.createElement("td");
+
+
+                    //Append the rows in order you would like to appear
+                    row.append(description_cell);
+                    row.append(due_date_cell);
+                    row.append(completion_cell);
+                    row.append(action_cell);
+
+                    table_body.append(row)
+                });
             } catch (error) {
                 notification_div.style.visibility = "visible"
                 notification_div.textContent = "Unknown Error has occured";
