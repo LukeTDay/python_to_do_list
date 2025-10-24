@@ -14,7 +14,7 @@
             <input type="text" id="todo_text" placeholder="Task title..." required>
             <input type="date" id="todo_date" required>
             <input type="time" id="todo_time" required>
-            <button type="submit">Add</button>
+            <button type="submit_form" id="submit_form">Add</button>
         </form>
 
         <table id="todo-table">
@@ -41,6 +41,49 @@
     <script>
         //Notification Div
         const notification_div = document.getElementById("notification_div");
+        
+        const new_todo_text = document.getElementById("todo_text");
+        const new_todo_date = document.getElementById("todo_date");
+        const new_todo_time = document.getElementById("todo_time");
+        //Submit new task form
+        const submit_form = document.getElementById("submit_form");
+        submit_form.addEventListener("click", async(event) =>{
+            event.preventDefault();
+            const token = sessionStorage.getItem("token");
+            const title = new_todo_text.value;
+            const date = new_todo_date.value;
+            const time = new_todo_time.value;
+            const due_by =  new Date(`${date}T${time}`);
+            try {
+                const response = await fetch(`/todos`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({title: title,
+                                        due_by :due_by.toISOString()})
+
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    notification_div.style.visibility = "visible"
+                    notification_div.textContent = `Error: ${errorData.detail || response.statusText}`;
+                    notification_div.style.background = "grey";
+                    setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
+                } else {
+                    notification_div.style.visibility = "visible"
+                    notification_div.textContent = "Notification Created :)";
+                    notification_div.style.background = "grey";
+                    setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
+        }
+            } catch (error) {
+                notification_div.style.visibility = "visible"
+                notification_div.textContent = "Unknown Error has occured";
+                notification_div.style.background = "grey";
+                setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
+            }
+        })
 
 
         async function getTodos() {
