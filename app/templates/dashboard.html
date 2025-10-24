@@ -87,7 +87,7 @@
             }
         })
 
-
+        const table_body = document.getElementById("todo_body");
         async function getTodos() {
             try {
                 const params = new URLSearchParams({ skip: 0, limit: 5 });
@@ -151,7 +151,7 @@
 
                     const update_button = document.createElement("button");
                     update_button.classList.add("update_button");
-                    delete_button.innerHTML = `<i class="fa-solid fa-pen"></i>`
+                    update_button.innerHTML = `<i class="fa-solid fa-pen"></i>`
                     action_cell.appendChild(update_button);
 
                     //Append the rows in order you would like to appear
@@ -170,8 +170,51 @@
                 setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
             }
         }
-
         getTodos()
+    
+        //Add button behaviour for the delete and update buttons in each row
+        table_body.addEventListener("click", async (e) => {
+            if (e.target && e.target.classList.contains("delete_button")) {
+                const row = e.target.closest("tr");
+                const cells = row.getElementsByTagName("td");
+                const id = cells[0].textContent;
+                const token = sessionStorage.getItem("token");
+
+                try {
+                    const response = await fetch(`/todos/delete`,{
+                        method: "POST",
+                        headers: { "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`},
+                        body: JSON.stringify({id: id})
+                    })
+
+                    if (response.status === 200){
+                        const data = await response.json();
+                        if (data.success === true){
+                            row.remove();
+                            notification_div.style.visibility = "visible"
+                            notification_div.textContent = "Todo was deleted";
+                            notification_div.style.background = "grey";
+                            setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
+                        } 
+                    }
+                    else {
+                        notification_div.style.visibility = "visible"
+                        notification_div.textContent = "Failed to delete Todo";
+                        notification_div.style.background = "grey";
+                        setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
+                    }
+                } catch (error) {
+                    notification_div.style.visibility = "visible"
+                    notification_div.textContent = `Unknown Error has occured ${error}`;
+                    notification_div.style.background = "grey";
+                    setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
+                }
+            }
+            else if (e.target && e.target.classList.contains("update_button")) {
+                const row = e.target.closest("tr");
+            }
+        });
 
 
 
