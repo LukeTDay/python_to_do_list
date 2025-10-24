@@ -5,6 +5,7 @@
     <title>My Todo App</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     
@@ -20,6 +21,7 @@
         <table id="todo-table">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Title</th>
                     <th>Due</th>
                     <th>Done</th>
@@ -123,6 +125,9 @@
                 todos.forEach(todo => {
                     const row = document.createElement("tr");
 
+                    const num_cell = document.createElement("td");
+                    num_cell.textContent = todo.id;
+
                     const description_cell = document.createElement("td");
                     description_cell.textContent = todo.title;
 
@@ -132,15 +137,25 @@
                     due_date_cell.textContent = `${date} ${time.split(".")[0]}`;
 
                     const completion_cell = document.createElement("td");
-                    checkbox = document.createElement("input");
+                    const checkbox = document.createElement("input");
                     checkbox.type = "checkbox";
                     checkbox.checked = todo.completed;
                     completion_cell.appendChild(checkbox);
 
                     const action_cell = document.createElement("td");
 
+                    const delete_button = document.createElement("button");
+                    delete_button.classList.add("delete_button");
+                    delete_button.innerHTML = `<i class="fa-solid fa-trash"></i>`
+                    action_cell.appendChild(delete_button);
+
+                    const update_button = document.createElement("button");
+                    update_button.classList.add("update_button");
+                    update_button.innerHTML = `<i class="fa-solid fa-pen"></i>`
+                    action_cell.appendChild(update_button);
 
                     //Append the rows in order you would like to appear
+                    row.append(num_cell)
                     row.append(description_cell);
                     row.append(due_date_cell);
                     row.append(completion_cell);
