@@ -132,7 +132,10 @@
                     due_date_cell.textContent = `${date} ${time.split(".")[0]}`;
 
                     const completion_cell = document.createElement("td");
-                    completion_cell.textContent = todo.completed
+                    checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.checked = todo.completed;
+                    completion_cell.appendChild(checkbox);
 
                     const action_cell = document.createElement("td");
 
