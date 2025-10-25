@@ -52,9 +52,13 @@ python -m venv venv
 ```
 # Activate the environment:
 # On Linux/macOS:
+```
 source venv/bin/activate
+```
 # On Windows:
+```
 venv\Scripts\activate
+```
 
 # Install dependencies
 ```
@@ -62,7 +66,9 @@ pip install -r requirements.txt
 ```
 
 # Copy and configure environment variables
+```
 cp .env.example .env
+```
 # Then open .env and fill in:
 DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, SECRET_KEY
 
