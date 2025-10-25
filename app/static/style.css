@@ -83,7 +83,6 @@ table {
 table, th, tr, td{
     border: 1px solid grey;
     border-collapse: collapse;
-    max-width: 100px;
     min-width: 100px;
 }
 

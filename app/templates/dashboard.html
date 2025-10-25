@@ -36,9 +36,36 @@
             <span id="page-info">Page 1</span>
             <button id="next">Next &raquo;</button>
         </div>
-    
-
-    <div id="notification_div"></div>
+        <div id="notification_div"></div>
+        <table id="table_update" style="visibility:hidden">
+            <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Due</th>
+                <th>Done</th>
+                <th>Update?</th>
+            </tr>
+            <tbody id="update-body">
+                <tr>
+                    <th id="update_id"></th>
+                    <th id="update_title">
+                        <input type="text">
+                    </th>
+                    <th id="update_due">
+                        <input id="update_date" type="date">
+                        <input id="update_time" type="time">
+                    </th>
+                    <th id="done_id">
+                        <input id="checkbox_update" type="checkbox">
+                    </th>
+                    <th id="do_update">
+                        <button id="yes_do_update">yes</button>
+                        <button id="no_do_update">no</button>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+        <div id="notification_div"></div>
 
     <script>
         //Notification Div
@@ -174,7 +201,9 @@
     
         //Add button behaviour for the delete and update buttons in each row
         table_body.addEventListener("click", async (e) => {
-            if (e.target && e.target.classList.contains("delete_button")) {
+            const deleteButton = e.target.closest(".delete_button");
+            const updateButton = e.target.closest(".update_button");
+            if (deleteButton) {
                 const row = e.target.closest("tr");
                 const cells = row.getElementsByTagName("td");
                 const id = cells[0].textContent;
@@ -211,10 +240,79 @@
                     setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
                 }
             }
-            else if (e.target && e.target.classList.contains("update_button")) {
+            else if (updateButton) {
+                //console.log("Firing")
+                const table_update = document.getElementById("table_update");
+                table_update.style.visibility = "visible";
+
                 const row = e.target.closest("tr");
+                const cells = row.getElementsByTagName("td");
+
+                const id = cells[0].textContent;
+                const title = cells[1].textContent;
+                const due_parts = cells[2].textContent.split(" ");
+                const date_part = due_parts[0];
+                const time_part = due_parts[1].slice(0,5);
+                //console.log(due_parts)
+
+
+                const complete = cells[3].querySelector("input").checked
+                //console.log(complete)
+
+                document.getElementById("update_id").textContent = id
+                document.querySelector("#update_title input").value = title;
+                document.getElementById("update_date").value = date_part
+                document.getElementById("update_time").value = time_part
+                document.getElementById("checkbox_update").checked = complete;
+
             }
         });
+
+        //yes_update
+        yes_update = document.getElementById("yes_do_update");
+
+        yes_update.addEventListener("click", async (event) => {
+            const id = document.getElementById("update_id").textContent;
+            const title = document.querySelector("#update_title input").value;
+            const date = document.getElementById("update_date").value;
+            const time = document.getElementById("update_time").value;
+            const completed = document.getElementById("checkbox_update").checked;
+            const token = sessionStorage.getItem("token");
+            const due_by =  new Date(`${date}T${time}`);
+
+            try {
+                const response = await fetch(`/todos/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        title: title,
+                        due_by: due_by.toISOString(),
+                        completed: completed        
+                    })
+
+                });
+            } catch (error) {
+                notification_div.style.visibility = "visible"
+                notification_div.textContent = `Error ${error}`;
+                notification_div.style.background = "grey";
+                setTimeout(() => {notification_div.style.visibility = "hidden";}, 2000);
+            }
+        })
+
+        //no_update
+        no_update = document.getElementById("no_do_update");
+
+        no_update.addEventListener("click", async (event) => {
+            document.getElementById("update_id").textContent = null
+            document.querySelector("#update_title input").value = null;
+            document.getElementById("update_date").value = null
+            document.getElementById("update_time").value = null
+            document.getElementById("checkbox_update").checked = false;
+            document.getElementById("table_update").style.visibility = "hidden";
+        })
 
 
 
