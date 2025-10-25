@@ -37,11 +37,19 @@ It is designed to be **secure**, **modular**, and **easy to understand**, making
 - Only authenticated users can access their personal todos.
 
 # Clone the repository
+```bash
+# Clone the repository
 git clone https://github.com/yourusername/python_todo_app.git
-cd python_todo_app
+```
+```
+uvicorn app.main:app --reload
+```
+
 
 # Set up a virtual environment (cross-platform)
+```
 python -m venv venv
+```
 # Activate the environment:
 # On Linux/macOS:
 source venv/bin/activate
@@ -49,7 +57,9 @@ source venv/bin/activate
 venv\Scripts\activate
 
 # Install dependencies
+```
 pip install -r requirements.txt
+```
 
 # Copy and configure environment variables
 cp .env.example .env
@@ -57,4 +67,10 @@ cp .env.example .env
 DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, SECRET_KEY
 
 # Run the FastAPI server
+```
 uvicorn app.main:app --reload
+```
+
+You will then be able to access the website locally at `http://127.0.0.1:8000/`
+
+
