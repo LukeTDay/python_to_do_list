@@ -1,7 +1,7 @@
 # Python Todo App
 
 A **full-stack Todo list application** built with **FastAPI**, **SQLAlchemy**, and **vanilla JavaScript**.  
-This app allows users to **register, log in, and manage personal tasks** with features like pagination, updating, and deleting todos.  
+This app allows users to **register, log in, and manage personal tasks** with features like creating, updating, and deleting todos.  
 
 It is designed to be **secure**, **modular**, and **easy to understand**, making it a strong example for portfolios or resumes.
 
@@ -11,7 +11,6 @@ It is designed to be **secure**, **modular**, and **easy to understand**, making
 
 - **User Authentication:** Secure registration and login using JWT tokens.
 - **CRUD Operations:** Create, read, update, and delete todos.
-- **Pagination:** Display tasks in a paginated table.
 - **Dynamic Frontend:** Interactive dashboard using vanilla JavaScript and HTML/CSS.
 - **Responsive Notifications:** Real-time user feedback for actions like task creation or deletion.
 - **Database Integration:** PostgreSQL with SQLAlchemy ORM for data persistence.
