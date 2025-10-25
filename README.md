@@ -30,10 +30,6 @@ It is designed to be **secure**, **modular**, and **easy to understand**, making
 
 ---
 
-## Installation
-
-1. **Clone the repository:**
-
 # Clone the repository
 git clone https://github.com/yourusername/python_todo_app.git
 cd python_todo_app
@@ -52,7 +48,7 @@ pip install -r requirements.txt
 # Copy and configure environment variables
 cp .env.example .env
 # Then open .env and fill in:
-# DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, SECRET_KEY
+DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, SECRET_KEY
 
 # Run the FastAPI server
 uvicorn app.main:app --reload
