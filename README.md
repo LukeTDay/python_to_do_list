@@ -32,8 +32,8 @@ It is designed to be **secure**, **modular**, and **easy to understand**, making
 
 ## Security
 
-- Passwords are hashed using bcrypt via passlib.
-- JWT tokens ensure stateless authentication.
+- **Passwords** are hashed and salted using **bcrypt** via `passlib`, protecting against brute-force and rainbow table attacks.
+- **JWT tokens** ensure stateless authentication.
 - Only authenticated users can access their personal todos.
 
 # Clone the repository
