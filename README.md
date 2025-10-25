@@ -33,7 +33,7 @@ It is designed to be **secure**, **modular**, and **easy to understand**, making
 ## Security
 
 - **Passwords** are hashed and salted using **bcrypt** via `passlib`, protecting against brute-force and rainbow table attacks.
-- **JWT tokens** ensure stateless authentication.
+- **JWT tokens** are used for authentication and include an **expiration time** to limit token lifetime and improve security.
 - Only authenticated users can access their personal todos.
 
 # Clone the repository
