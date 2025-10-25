@@ -30,6 +30,12 @@ It is designed to be **secure**, **modular**, and **easy to understand**, making
 
 ---
 
+## Security
+
+- Passwords are hashed using bcrypt via passlib.
+- JWT tokens ensure stateless authentication.
+- Only authenticated users can access their personal todos.
+
 # Clone the repository
 git clone https://github.com/yourusername/python_todo_app.git
 cd python_todo_app
